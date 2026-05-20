@@ -15,7 +15,7 @@ spring:
       probability: 1.0
 
 server:
-  port: 8084
+  port: 7788
 
 management:
   endpoints:
