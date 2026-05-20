@@ -1,0 +1,10 @@
+rootProject.name = 'shop-parent'
+
+include 'common:common-entity'
+include 'common:common-exception'
+include 'common:common-util'
+include 'user-service'
+include 'product-service'
+include 'order-service'
+include 'gateway'
+include 'monitor-service'
