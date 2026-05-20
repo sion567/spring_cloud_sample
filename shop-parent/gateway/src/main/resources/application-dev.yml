@@ -1,23 +1,5 @@
 spring:
   cloud:
-    gateway:
-      routes:
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/user/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/api/product/**
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/api/order/**
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
     consul:
       host: 192.168.40.198
       port: 8500
@@ -25,7 +7,31 @@ spring:
         enabled: true
         register: true
         service-name: ${spring.application.name}
-        health-check-path: /actuator/health # 网关提供健康检查的路径
-        health-check-interval: 10s          # 每10秒检查一次
-        instance-id: ${spring.application.name}:${server.port}:${random.value} # 保证分布式部署时实例 ID 唯一
-        prefer-ip-address: true     # 推荐：注册时使用 IP 地址而不是计算机名，避免跨网络时解析不到
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        instance-id: ${spring.application.name}:${server.port}:${random.value}
+        prefer-ip-address: true
+    gateway:
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+      routes:
+        - id: user-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/user/**
+        - id: product-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/product/**
+        - id: order-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/order/**
+
+logging:
+  level:
+    com.shop.gateway.filter: INFO
+    org.springframework.cloud.gateway: TRACE
+    reactor.netty.http.client.HttpClient: DEBUG

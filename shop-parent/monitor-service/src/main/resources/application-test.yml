@@ -3,6 +3,7 @@ spring:
     admin:
       discovery:
         enabled: true
+        ignored-services: consul
   cloud:
     consul:
       host: 192.168.40.198

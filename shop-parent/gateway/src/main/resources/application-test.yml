@@ -1,6 +1,21 @@
 spring:
   cloud:
+    consul:
+      host: 192.168.40.198
+      port: 8500
+      discovery:
+        enabled: true
+        register: true
+        service-name: ${spring.application.name}
+        health-check-path: /actuator/health # 网关提供健康检查的路径
+        health-check-interval: 10s          # 每10秒检查一次
+        instance-id: ${spring.application.name}:${server.port}:${random.value} # 保证分布式部署时实例 ID 唯一
+        prefer-ip-address: true     # 推荐：注册时使用 IP 地址而不是计算机名，避免跨网络时解析不到
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: user-service
           uri: lb://user-service
@@ -14,18 +29,3 @@ spring:
           uri: lb://order-service
           predicates:
             - Path=/api/order/**
-      discovery:
-        locator:
-          enabled: true
-          lower-case-service-id: true
-    consul:
-      host: 192.168.40.198
-      port: 8500
-      discovery:
-        enabled: true
-        register: true
-        service-name: ${spring.application.name}
-        health-check-path: /actuator/health # 网关提供健康检查的路径
-        health-check-interval: 10s          # 每10秒检查一次
-        instance-id: ${spring.application.name}:${server.port}:${random.value} # 保证分布式部署时实例 ID 唯一
-        prefer-ip-address: true     # 推荐：注册时使用 IP 地址而不是计算机名，避免跨网络时解析不到
