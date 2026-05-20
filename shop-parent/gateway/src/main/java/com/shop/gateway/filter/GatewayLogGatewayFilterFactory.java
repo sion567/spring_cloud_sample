@@ -9,7 +9,6 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
-@Component
 @Slf4j
 public class GatewayLogGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
     @Override

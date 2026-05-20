@@ -17,15 +17,15 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: user-service
+        - id: user_route
           uri: lb://user-service
           predicates:
             - Path=/api/user/**
-        - id: product-service
+        - id: user_route
           uri: lb://product-service
           predicates:
             - Path=/api/product/**
-        - id: order-service
+        - id: user_route
           uri: lb://order-service
           predicates:
             - Path=/api/order/**
