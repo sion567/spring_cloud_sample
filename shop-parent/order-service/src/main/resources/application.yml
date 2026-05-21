@@ -3,6 +3,14 @@ spring:
     name: order-service
   profiles:
     active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.40.198:8848
+        fail-fast: false
+        timeout: 5000
+        watch-delay: 30000
+        namespace: public
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
@@ -15,8 +23,17 @@ spring:
 server:
   port: 8083
 
-product-service:
-  url: http://localhost:8082
+dubbo:
+  application:
+    name: ${spring.application.name}
+  protocol:
+    triple:
+      name: tri
+      port: -1
+  registry:
+    address: nacos://192.168.40.198:8848
+    parameters:
+      namespace: public
 
 management:
   endpoints:

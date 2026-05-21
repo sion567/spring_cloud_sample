@@ -6,7 +6,9 @@ plugins {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webflux'
-    implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
+    implementation 'com.alibaba.cloud:spring-cloud-starter-alibaba-nacos-discovery'
+    implementation 'org.apache.dubbo:dubbo-spring-boot-starter'
+    implementation project(':common:common-dubbo-api')
 
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'

@@ -1,15 +1,16 @@
 package com.shop.order.service;
 
 import com.shop.common.exception.BusinessException;
-import com.shop.order.client.ProductClient;
-import com.shop.order.client.ProductDTO;
-import com.shop.order.controller.dto.CreateOrderRequest;
-import com.shop.order.controller.dto.PayOrderRequest;
+import com.shop.dubbo.api.product.ProductResponse;
+import com.shop.dubbo.api.product.ProductDubboService;
+import com.shop.order.service.dto.CreateOrderCommand;
+import com.shop.order.service.dto.PayOrderCommand;
 import com.shop.order.entity.Order;
 import com.shop.order.entity.OrderItem;
 import com.shop.order.repository.OrderItemRepository;
 import com.shop.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -27,15 +28,17 @@ import java.util.List;
 public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final ProductClient productClient;
+
+    @DubboReference
+    private ProductDubboService productDubboService;
 
     @Transactional
-    public Order createOrder(CreateOrderRequest request) {
+    public Order createOrder(CreateOrderCommand request) {
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
-        for (CreateOrderRequest.OrderItemRequest itemRequest : request.getItems()) {
-            ProductDTO product = productClient.getProductById(itemRequest.getProductId());
+        for (CreateOrderCommand.OrderItemCommand itemRequest : request.getItems()) {
+            ProductResponse product = productDubboService.getProductById(itemRequest.getProductId());
             if (product.getStock() < itemRequest.getQuantity()) {
                 throw new BusinessException(2002, "商品[" + product.getName() + "]库存不足");
             }
@@ -89,7 +92,7 @@ public class OrderService {
     }
 
     @Transactional
-    public void payOrder(Long id, PayOrderRequest request) {
+    public void payOrder(Long id, PayOrderCommand request) {
         Order order = getOrderById(id);
         if (order.getStatus() != 0) {
             throw new BusinessException(3002, "订单状态不允许支付");

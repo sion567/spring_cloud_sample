@@ -18,19 +18,24 @@ spring:
           acquire-timeout: 2000
       metrics:
         enabled: true
+      # 开启网关从注册中心（Nacos）自动发现服务的能力
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-name: true # 允许使用小写服务名进行路由
       server:
         webflux:
           routes:
-            - id: user_route
-              uri: http://localhost:8081
+            - id: user_service_route
+              uri: lb://user-service
               predicates:
                 - Path=/api/user/**
-            - id: product_route
-              uri: http://localhost:8082
+            - id: product_service_route
+              uri: lb://product-service
               predicates:
                 - Path=/api/product/**
-            - id: order_route
-              uri: http://localhost:8083
+            - id: order_service_route
+              uri: lb://order-service
               predicates:
                 - Path=/api/order/**
 

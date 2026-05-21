@@ -1,8 +1,8 @@
 package com.shop.product.service;
 
 import com.shop.common.exception.BusinessException;
-import com.shop.product.controller.dto.ProductRequest;
-import com.shop.product.controller.dto.StockUpdateRequest;
+import com.shop.product.service.dto.ProductSaveCommand;
+import com.shop.product.service.dto.StockUpdateCommand;
 import com.shop.product.entity.Product;
 import com.shop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product createProduct(ProductRequest request) {
+    public Product createProduct(ProductSaveCommand request) {
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -46,7 +46,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product updateProduct(Long id, ProductRequest request) {
+    public Product updateProduct(Long id, ProductSaveCommand request) {
         Product product = getProductById(id);
         if (request.getName() != null) {
             product.setName(request.getName());
@@ -77,7 +77,7 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateStock(Long id, StockUpdateRequest request) {
+    public void updateStock(Long id, StockUpdateCommand request) {
         Product product = getProductById(id);
         int newStock = product.getStock() + request.getQuantity();
         if (newStock < 0) {

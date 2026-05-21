@@ -1,7 +1,7 @@
 package com.shop.user.service;
 
 import com.shop.common.exception.BusinessException;
-import com.shop.user.controller.dto.AddressRequest;
+import com.shop.user.service.dto.AddressCommand;
 import com.shop.user.entity.Address;
 import com.shop.user.repository.AddressRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class AddressService {
     }
 
     @Transactional
-    public Address addAddress(Long userId, AddressRequest request) {
+    public Address addAddress(Long userId, AddressCommand request) {
         if (request.getIsDefault()) {
             addressRepository.findByUserId(userId).forEach(addr -> {
                 addr.setIsDefault(false);
@@ -31,7 +31,7 @@ public class AddressService {
         Address address = new Address();
         address.setUserId(userId);
         address.setReceiverName(request.getReceiverName());
-        address.setPhone(request.getPhone());
+        address.setPhone(request.getReceiverPhone());
         address.setProvince(request.getProvince());
         address.setCity(request.getCity());
         address.setDistrict(request.getDistrict());

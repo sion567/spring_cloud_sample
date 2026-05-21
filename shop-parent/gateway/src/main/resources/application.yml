@@ -3,6 +3,14 @@ spring:
     name: gateway
   profiles:
     active: dev
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.40.198:8848
+        fail-fast: false
+        timeout: 5000
+        watch-delay: 30000
+        namespace: public
   zipkin:
     base-url: http://192.168.40.198:9411
   sleuth:

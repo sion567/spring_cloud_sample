@@ -1,8 +1,8 @@
 package com.shop.user.service;
 
 import com.shop.common.exception.BusinessException;
-import com.shop.user.controller.dto.LoginRequest;
-import com.shop.user.controller.dto.RegisterRequest;
+import com.shop.user.service.dto.LoginCommand;
+import com.shop.user.service.dto.RegisterCommand;
 import com.shop.user.entity.User;
 import com.shop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.Map;
 public class UserService {
     private final UserRepository userRepository;
 
-    public Map<String, Object> register(RegisterRequest request) {
+    public Map<String, Object> register(RegisterCommand request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException(1001, "用户名已存在");
         }
@@ -43,7 +43,7 @@ public class UserService {
         return result;
     }
 
-    public Map<String, Object> login(LoginRequest request) {
+    public Map<String, Object> login(LoginCommand request) {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new BusinessException(1002, "用户名或密码错误"));
 
@@ -66,7 +66,7 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(404, "用户不存在"));
     }
 
-    public User updateUser(Long id, RegisterRequest request) {
+    public User updateUser(Long id, RegisterCommand request) {
         User user = getUserById(id);
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());
