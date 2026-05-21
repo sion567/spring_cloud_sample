@@ -1,17 +1,6 @@
 spring:
   cloud:
-    consul:
-      host: 192.168.40.198
-      port: 8500
-      discovery:
-        enabled: true
-        register: true
-        service-name: ${spring.application.name}
-        health-check-path: /actuator/health
-        health-check-interval: 10s
-        instance-id: ${spring.application.name}:${server.port}:${random.value}
-        prefer-ip-address: true
-    gateway:
+    gateway.server.webflux:
       httpclient:
         pool:
           max-connections: 1000
@@ -23,21 +12,19 @@ spring:
         locator:
           enabled: true
           lower-case-service-name: true # 允许使用小写服务名进行路由
-      server:
-        webflux:
-          routes:
-            - id: user_service_route
-              uri: lb://user-service
-              predicates:
-                - Path=/api/user/**
-            - id: product_service_route
-              uri: lb://product-service
-              predicates:
-                - Path=/api/product/**
-            - id: order_service_route
-              uri: lb://order-service
-              predicates:
-                - Path=/api/order/**
+      routes:
+        - id: user_service_route
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user/**
+        - id: product_service_route
+          uri: lb://product-service
+          predicates:
+            - Path=/api/product/**
+        - id: order_service_route
+          uri: lb://order-service
+          predicates:
+            - Path=/api/order/**
 
 logging:
   level:

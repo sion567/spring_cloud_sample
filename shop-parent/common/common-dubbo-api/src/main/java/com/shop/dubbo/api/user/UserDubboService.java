@@ -2,6 +2,7 @@ package com.shop.dubbo.api.user;
 
 import java.util.Map;
 
+@RequestMapping("/api/user")
 public interface UserDubboService {
     Map<String, Object> register(RegisterRequest request);
 
