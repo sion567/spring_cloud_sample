@@ -1,21 +1,19 @@
 package com.shop.gateway.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.cloud.gateway.support.ServerWebExchangeUtils;
-import org.springframework.core.Ordered;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
 @Slf4j
-public class GatewayLogFilter implements GlobalFilter, Ordered {
-
+public class GatewayLogFilter2 implements GatewayFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        System.out.println("====== [SysOut] 收到请求，路径是: " + exchange.getRequest().getURI().getPath());
+        System.out.println("------ [SysOut] 收到请求，路径是: " + exchange.getRequest().getURI().getPath());
         String rawPath = exchange.getRequest().getURI().getPath();
         return chain.filter(exchange).then(Mono.fromRunnable(() -> {
             URI routeUri = exchange.getAttribute(ServerWebExchangeUtils.GATEWAY_REQUEST_URL_ATTR);
@@ -25,10 +23,5 @@ public class GatewayLogFilter implements GlobalFilter, Ordered {
             log.info(" 网关监控 -> 原始请求: [{}], 最终实际转发目的地: [{}], 响应状态码: [{}]",
                     rawPath, targetUri, statusCode);
         }));
-    }
-
-    @Override
-    public int getOrder() {
-        return -1;
     }
 }

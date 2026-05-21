@@ -16,7 +16,7 @@ subprojects {
     repositories {
         mavenCentral()
     }
-
+// https://spring.io/blog/2026/01/29/spring-cloud-2025-1-1-aka-oakwood-has-been-released
     dependencyManagement {
         imports {
             mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.6'

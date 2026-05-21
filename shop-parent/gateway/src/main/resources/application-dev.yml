@@ -12,26 +12,34 @@ spring:
         instance-id: ${spring.application.name}:${server.port}:${random.value}
         prefer-ip-address: true
     gateway:
-      discovery:
-        locator:
-          enabled: false
-          lower-case-service-id: true
-      routes:
-        - id: user_route
-          uri: http://localhost:8081
-          predicates:
-            - Path=/api/user/**
-        - id: product_route
-          uri: http://localhost:8082
-          predicates:
-            - Path=/api/product/**
-        - id: order_route
-          uri: http://localhost:8083
-          predicates:
-            - Path=/api/order/**
+      httpclient:
+        pool:
+          max-connections: 1000
+          acquire-timeout: 2000
+      metrics:
+        enabled: true
+      server:
+        webflux:
+          routes:
+            - id: user_route
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/user/**
+            - id: product_route
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/product/**
+            - id: order_route
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/order/**
 
 logging:
   level:
     root: INFO
-    org.springframework.cloud.gateway: INFO
     com.shop.gateway: DEBUG
+#    org.springframework.cloud.gateway: TRACE
+#    org.springframework.http.server.reactive: DEBUG
+#    org.springframework.web.reactive: DEBUG
+#    reactor.ipc.netty: DEBUG
+#    reactor.netty: DEBUG
