@@ -1,36 +1,25 @@
 package com.shop.dubbo.api.product;
 
 import com.shop.dubbo.api.common.PageResult;
-import jakarta.ws.rs.*;
+
 import java.util.List;
 
 public interface ProductDubboService {
-//    @GET
-//    @Path("/{id}")
-    ProductResponse getProductById(@PathParam("id") Long id);
 
-//    @GET
+    ProductResponse getProductById(Long id);
+
     PageResult<ProductResponse> getProductPage(
-            @QueryParam("page") Integer page,
-            @QueryParam("size") Integer size,
-            @QueryParam("categoryId") Long categoryId);
+            Integer page,
+            Integer size,
+            Long categoryId);
 
-    @POST
     ProductResponse createProduct(ProductSaveRequest request);
 
-    @PUT
-    @Path("/{id}")
-    ProductResponse updateProduct(@PathParam("id") Long id, ProductSaveRequest request);
+    ProductResponse updateProduct(Long id, ProductSaveRequest request);
 
-    @DELETE
-    @Path("/{id}")
-    void deleteProduct(@PathParam("id") Long id);
+    void deleteProduct(Long id);
 
-    @PUT
-    @Path("/{id}/stock")
-    void updateStock(@PathParam("id") Long id, StockUpdateRequest request);
+    void updateStock(Long id, StockUpdateRequest request);
 
-    @POST
-    @Path("/batch")
     List<ProductResponse> getProductsByIds(List<Long> ids);
 }

@@ -16,7 +16,9 @@ spring:
         - id: user_service_route
           uri: http://localhost:50051
           predicates:
-            - Path=/api/user/**
+            - Path=/api/user/{segment}
+          filters:
+            - RewritePath=/api/user/(?<remaining>.*), /com.shop.dubbo.api.user.UserDubboService/${remaining}
         - id: product_service_route
           uri: http://localhost:50052
           predicates:

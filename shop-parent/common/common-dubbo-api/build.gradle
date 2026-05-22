@@ -11,5 +11,4 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding'
 
     implementation 'org.apache.dubbo:dubbo-remoting-http12:3.3.6'
-//    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.0.0'
 }
