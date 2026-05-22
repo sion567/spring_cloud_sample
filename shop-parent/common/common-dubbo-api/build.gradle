@@ -7,6 +7,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation 'org.mapstruct:mapstruct'
-    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3' // 自动包含处理器
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding'
+
+    implementation 'org.apache.dubbo:dubbo-remoting-http12:3.3.6'
+//    implementation 'jakarta.ws.rs:jakarta.ws.rs-api:3.0.0'
 }

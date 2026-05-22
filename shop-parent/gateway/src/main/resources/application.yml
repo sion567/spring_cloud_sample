@@ -17,9 +17,6 @@ spring:
     sampler:
       probability: 1.0
 
-server:
-  port: 8080
-
 dubbo:
   application:
     name:  ${spring.application.name}
@@ -28,18 +25,8 @@ dubbo:
     address: nacos://192.168.40.198:8848
   consumer:
     check: false
+    protocol: tri
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,gateway,prometheus
-  endpoint:
-    health:
-      show-details: always
-  metrics:
-    tags:
-      application: ${spring.application.name}
 
 logging:
   level:

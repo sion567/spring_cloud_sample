@@ -1,19 +1,38 @@
 package com.shop.dubbo.api.order;
 
 import com.shop.dubbo.api.common.PageResult;
+import jakarta.ws.rs.*;
 
+@Path("/api/order")
 public interface OrderDubboService {
+    @POST
     OrderResponse createOrder(CreateOrderRequest request);
 
-    OrderResponse getOrderById(Long id);
+    @GET
+    @Path("/{id}")
+    OrderResponse getOrderById(@PathParam("id") Long id);
 
-    OrderResponse getOrderByOrderNo(String orderNo);
+    @GET
+    @Path("/no/{orderNo}")
+    OrderResponse getOrderByOrderNo(@PathParam("orderNo") String orderNo);
 
-    PageResult<OrderResponse> getUserOrders(Long userId, Integer status, Integer page, Integer size);
+    @GET
+    @Path("/user/{userId}")
+    PageResult<OrderResponse> getUserOrders(
+            @PathParam("userId") Long userId,
+            @QueryParam("status") Integer status,
+            @QueryParam("page") Integer page,
+            @QueryParam("size") Integer size);
 
-    void payOrder(Long id, PayOrderRequest request);
+    @PUT
+    @Path("/{id}/pay")
+    void payOrder(@PathParam("id") Long id, PayOrderRequest request);
 
-    void cancelOrder(Long id);
+    @PUT
+    @Path("/{id}/cancel")
+    void cancelOrder(@PathParam("id") Long id);
 
-    void shipOrder(Long id);
+    @PUT
+    @Path("/{id}/ship")
+    void shipOrder(@PathParam("id") Long id);
 }

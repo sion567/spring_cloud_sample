@@ -11,6 +11,9 @@ spring:
         timeout: 5000
         watch-delay: 30000
         namespace: public
+        management-port: ${server.port}
+        metadata:
+          management.port: ${server.port}
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
@@ -23,26 +26,18 @@ spring:
 dubbo:
   application:
     name: ${spring.application.name}
+    qos-enable: false
   protocol:
-    triple:
-      name: tri
-      port: -1
+    name: tri
+    port: ${DUBBO_PORT:50052}
   registry:
     address: nacos://192.168.40.198:8848
     parameters:
       namespace: public
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,prometheus
-  endpoint:
-    health:
-      show-details: always
   metrics:
-    tags:
-      application: ${spring.application.name}
+    protocol: prometheus
+    port: 20889
+    enable-jvm: true
 
 logging:
   level:

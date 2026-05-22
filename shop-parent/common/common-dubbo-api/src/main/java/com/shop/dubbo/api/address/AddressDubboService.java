@@ -1,9 +1,15 @@
 package com.shop.dubbo.api.address;
 
+import jakarta.ws.rs.*;
 import java.util.List;
 
+@Path("/api/address")
 public interface AddressDubboService {
-    List<AddressResponse> getAddressesByUserId(Long userId);
+    @GET
+    @Path("/user/{userId}")
+    List<AddressResponse> getAddressesByUserId(@PathParam("userId") Long userId);
 
-    AddressResponse addAddress(Long userId, AddressResponse request);
+    @POST
+    @Path("/user/{userId}")
+    AddressResponse addAddress(@PathParam("userId") Long userId, AddressResponse request);
 }
