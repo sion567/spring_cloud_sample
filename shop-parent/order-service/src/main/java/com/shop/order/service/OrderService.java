@@ -1,5 +1,6 @@
 package com.shop.order.service;
 
+import com.shop.common.entity.Result;
 import com.shop.common.exception.BusinessException;
 import com.shop.dubbo.api.product.ProductResponse;
 import com.shop.dubbo.api.product.ProductDubboService;
@@ -41,7 +42,7 @@ public class OrderService {
         BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (CreateOrderCommand.OrderItemCommand itemRequest : request.getItems()) {
-            ProductResponse product = productDubboService.getProductById(itemRequest.getProductId());
+            ProductResponse product = productDubboService.getById(itemRequest.getProductId()).getData();
             if (product.getStock() < itemRequest.getQuantity()) {
                 throw new BusinessException(2002, "商品[" + product.getName() + "]库存不足");
             }

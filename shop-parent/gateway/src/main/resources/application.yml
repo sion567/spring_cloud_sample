@@ -17,6 +17,9 @@ spring:
     sampler:
       probability: 1.0
 
+server:
+  port: 8080
+
 dubbo:
   application:
     name:  ${spring.application.name}
