@@ -3,6 +3,7 @@ package com.shop.product.dubbo;
 import com.shop.dubbo.api.common.CrudDubboServiceImpl;
 import com.shop.common.entity.Result;
 import com.shop.dubbo.api.common.PageResult;
+import com.shop.dubbo.api.common.QueryParams;
 import com.shop.dubbo.api.product.ProductResponse;
 import com.shop.dubbo.api.product.ProductSaveRequest;
 import com.shop.dubbo.api.product.StockUpdateRequest;
@@ -14,7 +15,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 
 import java.util.List;
 
-@DubboService
+@DubboService(version = "1.0", timeout = 3000, retries = 1)
 @RequiredArgsConstructor
 public class ProductDubboServiceImpl extends CrudDubboServiceImpl implements ProductDubboService {
 
@@ -28,27 +29,27 @@ public class ProductDubboServiceImpl extends CrudDubboServiceImpl implements Pro
     }
 
     @Override
-    public Object list(Integer page, Integer size) {
-        logRequest("list", "page=, size=", page, size);
-        var pageResult = productService.getProductPage(page, size, null);
+    public Object listPost(QueryParams params) {
+        logRequest("listPost", "params=", params);
+        var pageResult = productService.getProductPage(params.getPage(), params.getSize(), null);
         return PageResult.of(
                 pageResult.getContent().stream().map(productMapper::toDTO).toList(),
                 pageResult.getTotalElements(),
-                page,
-                size
+                params.getPage(),
+                params.getSize()
         );
     }
 
     @Override
-    public Result<ProductResponse> create(Object request) {
+    public Result<ProductResponse> create(ProductSaveRequest request) {
         logRequest("create", request);
-        return Result.success(productMapper.toDTO(productService.createProduct(productMapper.toCommand((ProductSaveRequest) request))));
+        return Result.success(productMapper.toDTO(productService.createProduct(productMapper.toCommand(request))));
     }
 
     @Override
-    public Result<ProductResponse> update(Long id, Object request) {
+    public Result<ProductResponse> update(Long id, ProductSaveRequest request) {
         logRequest("update", "id=, request=", id, request);
-        return Result.success(productMapper.toDTO(productService.updateProduct(id, productMapper.toCommand((ProductSaveRequest) request))));
+        return Result.success(productMapper.toDTO(productService.updateProduct(id, productMapper.toCommand(request))));
     }
 
     @Override

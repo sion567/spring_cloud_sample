@@ -6,7 +6,7 @@ import com.shop.dubbo.api.common.PageResult;
 
 import java.util.List;
 
-public interface ProductDubboService extends CrudDubboService<ProductResponse, Long> {
+public interface ProductDubboService extends CrudDubboService<ProductResponse, Long, ProductSaveRequest, ProductSaveRequest> {
 
     PageResult<ProductResponse> getProductPage(Integer page, Integer size, Long categoryId);
 

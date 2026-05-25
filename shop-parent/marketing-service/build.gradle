@@ -1,7 +1,4 @@
 plugins {
-plugins {
-plugins {
-plugins {
     id 'java-library'
     id 'org.springframework.boot'
 }

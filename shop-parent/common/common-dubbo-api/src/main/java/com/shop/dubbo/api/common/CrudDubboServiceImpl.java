@@ -27,4 +27,11 @@ public abstract class CrudDubboServiceImpl {
     protected void logRequest(String methodName, String paramName, Object paramValue) {
         log.debug("{} request: {}{}", methodName, paramName, paramValue);
     }
+
+    protected QueryParams queryParams(Integer page, Integer size) {
+        QueryParams params = new QueryParams();
+        if (page != null) params.setPage(page);
+        if (size != null) params.setSize(size);
+        return params;
+    }
 }

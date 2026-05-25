@@ -92,10 +92,7 @@ export const userApi = {
 }
 
 export const productApi = {
-  list: (params) => {
-    const qs = new URLSearchParams(params).toString()
-    return request(`/product/list?${qs}`)
-  },
+  list: (params) => request('/product/listPost', { method: 'POST', body: params }),
   get: (id) => request(`/product/${id}`),
   batch: (ids) => request(`/product/batch?ids=${ids.join(',')}`)
 }
@@ -103,10 +100,7 @@ export const productApi = {
 export const orderApi = {
   create: (data) => request('/order/create', { method: 'POST', body: data }),
   get: (id) => request(`/order/${id}`),
-  list: (userId, params) => {
-    const qs = new URLSearchParams(params).toString()
-    return request(`/order/user/${userId}?${qs}`)
-  },
+  list: (userId, params) => request(`/order/user`, { method: 'POST', body: { userId, ...params } }),
   pay: (id, data) => request(`/order/${id}/pay`, { method: 'PUT', body: data }),
   cancel: (id) => request(`/order/${id}/cancel`, { method: 'PUT' })
 }

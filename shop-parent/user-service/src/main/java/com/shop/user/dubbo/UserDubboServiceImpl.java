@@ -14,7 +14,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import java.util.Map;
 
 @Slf4j
-@DubboService
+@DubboService(version = "1.0", timeout = 3000, retries = 1)
 @RequiredArgsConstructor
 public class UserDubboServiceImpl implements UserDubboService {
     private final UserService userService;

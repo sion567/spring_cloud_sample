@@ -3,18 +3,25 @@ package com.shop.order.dubbo;
 import com.shop.dubbo.api.common.CrudDubboServiceImpl;
 import com.shop.common.entity.Result;
 import com.shop.dubbo.api.common.PageResult;
-import com.shop.dubbo.api.order.OrderResponse;
-import com.shop.dubbo.api.order.CreateOrderRequest;
-import com.shop.dubbo.api.order.PayOrderRequest;
-import com.shop.dubbo.api.order.OrderDubboService;
+import com.shop.dubbo.api.common.QueryParams;
+import com.shop.dubbo.api.order.*;
 import com.shop.dubbo.api.product.ProductDubboService;
 import com.shop.order.mapper.OrderMapper;
 import com.shop.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.apache.dubbo.config.annotation.Method;
 
-@DubboService
+@DubboService(version = "1.0", timeout = 3000,    // 接口级的默认超时时间
+        methods = {
+                // 👇 针对查询方法：允许重试 2 次（加上首次调用共3次）
+                @Method(name = "getById", retries = 2),
+                @Method(name = "listPost", retries = 2),
+                @Method(name = "getUserOrders", retries = 2),
+                // 👇 针对新增/修改方法：强制禁用重试（retries = 0）
+                @Method(name = "create", retries = 0),
+        })
 @RequiredArgsConstructor
 public class OrderDubboServiceImpl extends CrudDubboServiceImpl implements OrderDubboService {
     private final OrderService orderService;
@@ -30,25 +37,25 @@ public class OrderDubboServiceImpl extends CrudDubboServiceImpl implements Order
     }
 
     @Override
-    public Object list(Integer page, Integer size) {
-        logRequest("list", "page=, size=", page, size);
-        var pageResult = orderService.getUserOrders(null, null, page, size);
+    public Object listPost(QueryParams params) {
+        logRequest("listPost", "params=", params);
+        var pageResult = orderService.getUserOrders(null, null, params.getPage(), params.getSize());
         return PageResult.of(
                 pageResult.getContent().stream().map(orderMapper::toDTO).toList(),
                 pageResult.getTotalElements(),
-                page,
-                size
+                params.getPage(),
+                params.getSize()
         );
     }
 
     @Override
-    public Result<OrderResponse> create(Object request) {
+    public Result<OrderResponse> create(CreateOrderRequest request) {
         logRequest("create", request);
-        return Result.success(orderMapper.toDTO(orderService.createOrder(orderMapper.toServiceCreateOrderRequest((CreateOrderRequest) request))));
+        return Result.success(orderMapper.toDTO(orderService.createOrder(orderMapper.toServiceCreateOrderRequest(request))));
     }
 
     @Override
-    public Result<OrderResponse> update(Long id, Object request) {
+    public Result<OrderResponse> update(Long id, UpdateOrderRequest request) {
         logRequest("update", "id=, request=", id, request);
         throw new UnsupportedOperationException("订单不支持修改");
     }
