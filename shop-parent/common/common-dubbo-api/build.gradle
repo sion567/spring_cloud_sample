@@ -3,6 +3,8 @@ plugins {
 }
 
 dependencies {
+    implementation project(':common:common-entity')
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

@@ -1,0 +1,37 @@
+logging:
+  level:
+    root: INFO
+    com.shop: DEBUG
+
+server:
+  port: 8082
+
+spring:
+  application:
+    name: email-service
+  profiles:
+    active: dev
+  kafka:
+    bootstrap-servers: 192.168.40.198:9092
+    consumer:
+      group-id: email-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  mail:
+    host: smtp.example.com
+    port: 587
+    username: noreply@shop.com
+    password: mail-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

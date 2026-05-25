@@ -10,12 +10,27 @@ dependencies {
     implementation 'org.apache.dubbo:dubbo-spring-boot-starter'
     implementation 'org.apache.dubbo:dubbo-nacos-spring-boot-starter'
     implementation project(':common:common-dubbo-api')
+    implementation project(':common:common-entity')
 
     implementation 'org.springframework.cloud:spring-cloud-starter-loadbalancer'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'io.micrometer:micrometer-registry-prometheus'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection'
+
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation project(':common:common-jwt')
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.mockito:mockito-core'
+    testImplementation 'org.mockito:mockito-junit-jupiter'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+}
+
+test {
+    useJUnitPlatform()
 }

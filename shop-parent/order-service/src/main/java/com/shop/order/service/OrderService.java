@@ -10,6 +10,7 @@ import com.shop.order.entity.OrderItem;
 import com.shop.order.repository.OrderItemRepository;
 import com.shop.order.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OrderService {
@@ -34,6 +36,7 @@ public class OrderService {
 
     @Transactional
     public Order createOrder(CreateOrderCommand request) {
+        log.debug("createOrder request: userId={}, items={}", request.getUserId(), request.getItems().size());
         List<OrderItem> orderItems = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;
 
@@ -63,6 +66,7 @@ public class OrderService {
         order.setPayAmount(totalAmount);
         order.setStatus(0);
         order = orderRepository.save(order);
+        log.debug("order saved: id={}, orderNo={}", order.getId(), order.getOrderNo());
 
         for (OrderItem item : orderItems) {
             item.setOrderId(order.getId());
@@ -74,16 +78,19 @@ public class OrderService {
     }
 
     public Order getOrderById(Long id) {
+        log.debug("getOrderById request: id={}", id);
         return orderRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(3001, "订单不存在"));
     }
 
     public Order getOrderByOrderNo(String orderNo) {
+        log.debug("getOrderByOrderNo request: orderNo={}", orderNo);
         return orderRepository.findByOrderNo(orderNo)
                 .orElseThrow(() -> new BusinessException(3001, "订单不存在"));
     }
 
     public Page<Order> getUserOrders(Long userId, Integer status, Integer page, Integer size) {
+        log.debug("getUserOrders request: userId={}, status={}, page={}, size={}", userId, status, page, size);
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createTime"));
         if (status != null) {
             return orderRepository.findByUserIdAndStatus(userId, status, pageRequest);
@@ -93,6 +100,7 @@ public class OrderService {
 
     @Transactional
     public void payOrder(Long id, PayOrderCommand request) {
+        log.debug("payOrder request: id={}", id);
         Order order = getOrderById(id);
         if (order.getStatus() != 0) {
             throw new BusinessException(3002, "订单状态不允许支付");
@@ -106,6 +114,7 @@ public class OrderService {
 
     @Transactional
     public void cancelOrder(Long id) {
+        log.debug("cancelOrder request: id={}", id);
         Order order = getOrderById(id);
         if (order.getStatus() != 0) {
             throw new BusinessException(3002, "订单状态不允许取消");
@@ -117,6 +126,7 @@ public class OrderService {
 
     @Transactional
     public void shipOrder(Long id) {
+        log.debug("shipOrder request: id={}", id);
         Order order = getOrderById(id);
         if (order.getStatus() != 1) {
             throw new BusinessException(3002, "订单状态不允许发货");

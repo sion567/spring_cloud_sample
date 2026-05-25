@@ -1,24 +1,41 @@
 package com.shop.user.service;
 
+import com.shop.common.entity.Result;
 import com.shop.common.exception.BusinessException;
+import com.shop.common.jwt.JwtUtils;
 import com.shop.user.service.dto.LoginCommand;
 import com.shop.user.service.dto.RegisterCommand;
 import com.shop.user.entity.User;
 import com.shop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
 
-    public Map<String, Object> register(RegisterCommand request) {
+    @Value("${jwt.secret:defaultSecretKeyForDevOnlyPleaseChangeInProduction123456}")
+    private String jwtSecret;
+
+    @Value("${jwt.expiration:86400000}")
+    private Long jwtExpiration;
+
+    public static final String TOPIC_USER_REGISTER = "user-register";
+
+    public Result<Map<String, Object>> register(RegisterCommand request) {
+        log.debug("register request: username={}", request.getUsername());
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new BusinessException(1001, "用户名已存在");
         }
@@ -33,17 +50,27 @@ public class UserService {
         user.setPoints(100);
 
         user = userRepository.save(user);
+        log.debug("user saved: id={}", user.getId());
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", user.getId());
-        result.put("username", user.getUsername());
-        result.put("nickname", user.getNickname());
-        result.put("level", user.getLevel());
-        result.put("points", user.getPoints());
-        return result;
+        Map<String, Object> kafkaMessage = new HashMap<>();
+        kafkaMessage.put("userId", user.getId());
+        kafkaMessage.put("username", user.getUsername());
+        kafkaMessage.put("email", user.getEmail());
+        kafkaMessage.put("timestamp", System.currentTimeMillis());
+        kafkaTemplate.send(TOPIC_USER_REGISTER, user.getId().toString(), kafkaMessage);
+        log.debug("kafka message sent: topic={}, userId={}", TOPIC_USER_REGISTER, user.getId());
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", user.getId());
+        data.put("username", user.getUsername());
+        data.put("nickname", user.getNickname());
+        data.put("level", user.getLevel());
+        data.put("points", user.getPoints());
+        return Result.success(data);
     }
 
-    public Map<String, Object> login(LoginCommand request) {
+    public Result<Map<String, Object>> login(LoginCommand request) {
+        log.debug("login request: username={}", request.getUsername());
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new BusinessException(1002, "用户名或密码错误"));
 
@@ -51,22 +78,44 @@ public class UserService {
             throw new BusinessException(1002, "用户名或密码错误");
         }
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("token", "token_" + user.getId() + "_" + System.currentTimeMillis());
-        result.put("user", Map.of(
+        String token = JwtUtils.generateToken(jwtSecret, user.getId(), user.getUsername(), List.of("USER"), jwtExpiration);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", token);
+        data.put("user", Map.of(
                 "id", user.getId(),
                 "username", user.getUsername(),
                 "nickname", user.getNickname()
         ));
-        return result;
+        log.debug("login success: userId={}", user.getId());
+        return Result.success(data);
+    }
+
+    public Result<Map<String, Object>> refreshToken(String token) {
+        log.debug("refreshToken request");
+        if (!JwtUtils.validateToken(jwtSecret, token)) {
+            throw new BusinessException(401, "Token无效");
+        }
+
+        Long userId = JwtUtils.getUserId(jwtSecret, token);
+        String username = JwtUtils.getUsername(jwtSecret, token);
+
+        String newToken = JwtUtils.refreshToken(jwtSecret, token, jwtExpiration);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("token", newToken);
+        log.debug("refreshToken success: userId={}", userId);
+        return Result.success(data);
     }
 
     public User getUserById(Long id) {
+        log.debug("getUserById request: id={}", id);
         return userRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(404, "用户不存在"));
     }
 
     public User updateUser(Long id, RegisterCommand request) {
+        log.debug("updateUser request: id={}", id);
         User user = getUserById(id);
         if (request.getEmail() != null) {
             user.setEmail(request.getEmail());

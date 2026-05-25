@@ -7,11 +7,10 @@ spring:
           acquire-timeout: 2000
       metrics:
         enabled: true
-      # 开启网关从注册中心（Nacos）自动发现服务的能力
       discovery:
         locator:
           enabled: false
-          lower-case-service-name: true # 允许使用小写服务名进行路由
+          lower-case-service-name: true
       routes:
         - id: user_service_route
           uri: http://localhost:50051
@@ -22,16 +21,20 @@ spring:
         - id: product_service_route
           uri: http://localhost:50052
           predicates:
-            - Path=/api/product/**
+            - Path=/api/product/{segment}
+          filters:
+            - RewritePath=/api/product/(?<remaining>.*), /com.shop.dubbo.api.product.ProductDubboService/${remaining}
         - id: order_service_route
           uri: http://localhost:50053
           predicates:
-            - Path=/api/order/**
+            - Path=/api/order/{segment}
+          filters:
+            - RewritePath=/api/order/(?<remaining>.*), /com.shop.dubbo.api.order.ProductDubboService/${remaining}
 
 logging:
   level:
     root: INFO
-    com.shop.gateway: DEBUG
+    com.shop: DEBUG
 #    org.springframework.cloud.gateway: TRACE
 #    org.springframework.http.server.reactive: DEBUG
 #    org.springframework.web.reactive: DEBUG

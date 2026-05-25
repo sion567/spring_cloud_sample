@@ -41,5 +41,5 @@ dubbo:
 
 logging:
   level:
+    root: INFO
     com.shop: DEBUG
-    org.springframework.web: INFO

@@ -27,7 +27,12 @@ dubbo:
     check: false
     protocol: tri
 
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-token-signing-must-be-long-enough}
 
 logging:
   level:
+    root: INFO
+    com.shop: DEBUG
     org.springframework.cloud.gateway: DEBUG

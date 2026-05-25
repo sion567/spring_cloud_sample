@@ -21,6 +21,12 @@ timeout /t 8 > nul
 echo [4] gateway
 start "gateway" cmd /k "java -jar %DIR%\gateway\build\libs\gateway-1.0.0.jar"
 timeout /t 5 > nul
-echo [5] monitor-service
-start "monitor-service" cmd /k "java -jar %DIR%\monitor-service\build\libs\monitor-service-1.0.0.jar"
+echo [5] email-service
+start "email-service" cmd /k "java -jar %DIR%\email-service\build\libs\email-service-1.0.0.jar"
+timeout /t 5 > nul
+echo [6] marketing-service
+start "marketing-service" cmd /k "java -jar %DIR%\marketing-service\build\libs\marketing-service-1.0.0.jar"
+timeout /t 5 > nul
+echo [7] points-service
+start "points-service" cmd /k "java -jar %DIR%\points-service\build\libs\points-service-1.0.0.jar"
 pause

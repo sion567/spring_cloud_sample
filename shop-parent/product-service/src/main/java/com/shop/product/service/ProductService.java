@@ -6,6 +6,7 @@ import com.shop.product.service.dto.StockUpdateCommand;
 import com.shop.product.entity.Product;
 import com.shop.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,12 +15,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
 
     public Page<Product> getProductPage(Integer page, Integer size, Long categoryId) {
+        log.debug("getProductPage request: page={}, size={}, categoryId={}", page, size, categoryId);
         PageRequest pageRequest = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "createTime"));
         if (categoryId != null) {
             return productRepository.findByCategoryId(categoryId, pageRequest);
@@ -28,12 +31,14 @@ public class ProductService {
     }
 
     public Product getProductById(Long id) {
+        log.debug("getProductById request: id={}", id);
         return productRepository.findById(id)
                 .orElseThrow(() -> new BusinessException(2001, "商品不存在"));
     }
 
     @Transactional
     public Product createProduct(ProductSaveCommand request) {
+        log.debug("createProduct request: name={}", request.getName());
         Product product = new Product();
         product.setName(request.getName());
         product.setDescription(request.getDescription());
@@ -47,6 +52,7 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(Long id, ProductSaveCommand request) {
+        log.debug("updateProduct request: id={}", id);
         Product product = getProductById(id);
         if (request.getName() != null) {
             product.setName(request.getName());
@@ -71,6 +77,7 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long id) {
+        log.debug("deleteProduct request: id={}", id);
         Product product = getProductById(id);
         product.setStatus(0);
         productRepository.save(product);
@@ -78,6 +85,7 @@ public class ProductService {
 
     @Transactional
     public void updateStock(Long id, StockUpdateCommand request) {
+        log.debug("updateStock request: id={}, quantity={}", id, request.getQuantity());
         Product product = getProductById(id);
         int newStock = product.getStock() + request.getQuantity();
         if (newStock < 0) {
@@ -88,6 +96,7 @@ public class ProductService {
     }
 
     public List<Product> getProductsByIds(List<Long> ids) {
+        log.debug("getProductsByIds request: ids={}", ids);
         return productRepository.findByIdIn(ids);
     }
 }

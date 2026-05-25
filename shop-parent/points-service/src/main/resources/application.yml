@@ -1,0 +1,33 @@
+logging:
+  level:
+    root: INFO
+    com.shop: DEBUG
+
+server:
+  port: 8083
+
+spring:
+  application:
+    name: points-service
+  profiles:
+    active: dev
+  kafka:
+    bootstrap-servers: 192.168.40.198:9092
+    consumer:
+      group-id: points-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  datasource:
+    url: jdbc:h2:mem:pointsdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

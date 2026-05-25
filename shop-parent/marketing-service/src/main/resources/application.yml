@@ -1,0 +1,26 @@
+logging:
+  level:
+    root: INFO
+    com.shop: DEBUG
+
+server:
+  port: 8084
+
+spring:
+  application:
+    name: marketing-service
+  profiles:
+    active: dev
+  kafka:
+    bootstrap-servers: 192.168.40.198:9092
+    consumer:
+      group-id: marketing-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

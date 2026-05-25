@@ -42,8 +42,7 @@ dubbo:
         enabled: true
     enable-metadata: true
 
-
 logging:
   level:
+    root: INFO
     com.shop: DEBUG
-    org.springframework.web: INFO

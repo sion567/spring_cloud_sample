@@ -15,16 +15,20 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
   data:
     redis:
-      host: localhost
+      host: 192.168.40.198
       port: 6379
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 192.168.40.198:9092
     consumer:
       group-id: user-service-group
       auto-offset-reset: earliest
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-for-jwt-token-signing-must-be-long-enough}
+  expiration: 180000
 
 logging:
   level:

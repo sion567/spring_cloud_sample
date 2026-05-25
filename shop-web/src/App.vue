@@ -117,10 +117,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { userApi, productApi, orderApi } from './api.js'
+import { userApi, productApi, orderApi, getToken, getUser } from './api.js'
 
-const token = ref(localStorage.getItem('token') || '')
-const user = ref(JSON.parse(localStorage.getItem('user') || '{}'))
+const token = ref(getToken() || '')
+const user = ref(getUser())
 const authTab = ref('login')
 const tab = ref('products')
 
@@ -143,8 +143,6 @@ async function handleLogin() {
     const res = await userApi.login(loginForm.value)
     token.value = res.data.token
     user.value = res.data.user
-    localStorage.setItem('token', res.data.token)
-    localStorage.setItem('user', JSON.stringify(res.data.user))
     loadData()
   } catch (e) {
     alert(e.message || '登录失败')
@@ -163,10 +161,9 @@ async function handleRegister() {
 }
 
 function logout() {
+  userApi.logout()
   token.value = ''
   user.value = {}
-  localStorage.removeItem('token')
-  localStorage.removeItem('user')
   products.value = []
   cartItems.value = []
   orders.value = []
@@ -180,7 +177,7 @@ async function loadData() {
     await loadOrders()
     await loadAddresses()
   } catch (e) {
-    console.error(e)
+    console.error('加载数据失败:', e.message)
   }
 }
 
@@ -190,7 +187,7 @@ async function loadOrders() {
     const res = await orderApi.list(user.value.id, { page: 1, size: 100 })
     orders.value = res.data.records
   } catch (e) {
-    console.error(e)
+    console.error('加载订单失败:', e.message)
   }
 }
 
@@ -200,7 +197,7 @@ async function loadAddresses() {
     const res = await userApi.getAddresses(user.value.id)
     addresses.value = res.data
   } catch (e) {
-    console.error(e)
+    console.error('加载地址失败:', e.message)
   }
 }
 
@@ -261,7 +258,7 @@ async function cancelOrder(id) {
     await loadOrders()
     alert('取消成功')
   } catch (e) {
-    alert(e.message || '取消失败')
+    alert(e.message || '取消成功')
   }
 }
 
