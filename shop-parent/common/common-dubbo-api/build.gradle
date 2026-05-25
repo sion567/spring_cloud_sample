@@ -3,7 +3,10 @@ plugins {
 }
 
 dependencies {
-    implementation project(':common:common-entity')
+    api project(':common:common-entity')
+
+    implementation 'org.apache.dubbo:dubbo-remoting-http12:3.3.6'
+    implementation 'org.slf4j:slf4j-api'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -11,6 +14,4 @@ dependencies {
     implementation 'org.mapstruct:mapstruct'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
     annotationProcessor 'org.projectlombok:lombok-mapstruct-binding'
-
-    implementation 'org.apache.dubbo:dubbo-remoting-http12:3.3.6'
 }

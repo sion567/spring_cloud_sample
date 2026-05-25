@@ -29,7 +29,7 @@ spring:
           predicates:
             - Path=/api/order/{segment}
           filters:
-            - RewritePath=/api/order/(?<remaining>.*), /com.shop.dubbo.api.order.ProductDubboService/${remaining}
+            - RewritePath=/api/order/(?<remaining>.*), /com.shop.dubbo.api.order.OrderDubboService/${remaining}
 
 logging:
   level:

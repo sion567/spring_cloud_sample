@@ -1,24 +1,18 @@
 package com.shop.dubbo.api.order;
 
+import com.shop.common.entity.Result;
+import com.shop.dubbo.api.common.CrudDubboService;
 import com.shop.dubbo.api.common.PageResult;
 
-public interface OrderDubboService {
+public interface OrderDubboService extends CrudDubboService<OrderResponse, Long> {
 
-    OrderResponse createOrder(CreateOrderRequest request);
+    PageResult<OrderResponse> getUserOrders(Long userId, Integer status, Integer page, Integer size);
 
-    OrderResponse getOrderById(Long id);
+    PageResult<OrderResponse> user(Long userId, Integer page, Integer size);
 
-    OrderResponse getOrderByOrderNo(String orderNo);
+    Result<Void> payOrder(Long id, PayOrderRequest request);
 
-    PageResult<OrderResponse> getUserOrders(
-            Long userId,
-            Integer status,
-            Integer page,
-            Integer size);
+    Result<Void> cancelOrder(Long id);
 
-    void payOrder(Long id, PayOrderRequest request);
-
-    void cancelOrder(Long id);
-
-    void shipOrder(Long id);
+    Result<Void> shipOrder(Long id);
 }

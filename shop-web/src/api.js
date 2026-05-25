@@ -101,7 +101,7 @@ export const productApi = {
 }
 
 export const orderApi = {
-  create: (data) => request('/order', { method: 'POST', body: data }),
+  create: (data) => request('/order/create', { method: 'POST', body: data }),
   get: (id) => request(`/order/${id}`),
   list: (userId, params) => {
     const qs = new URLSearchParams(params).toString()

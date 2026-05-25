@@ -1,9 +1,11 @@
 package com.shop.dubbo.api.address;
 
+import com.shop.common.entity.Result;
+import com.shop.dubbo.api.common.CrudDubboService;
 
 import java.util.List;
 
-public interface AddressDubboService {
+public interface AddressDubboService extends CrudDubboService<AddressResponse, Long> {
 
     List<AddressResponse> getAddressesByUserId(Long userId);
 
