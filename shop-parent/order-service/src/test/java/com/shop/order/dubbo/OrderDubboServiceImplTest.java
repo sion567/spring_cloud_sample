@@ -1,14 +1,16 @@
 package com.shop.order.dubbo;
 
-import com.shop.common.exception.BusinessException;
+import com.shop.common.entity.Result;
 import com.shop.dubbo.api.common.PageResult;
 import com.shop.dubbo.api.order.CreateOrderRequest;
 import com.shop.dubbo.api.order.OrderResponse;
 import com.shop.dubbo.api.order.PayOrderRequest;
+import com.shop.dubbo.api.order.UserOrdersRequest;
 import com.shop.dubbo.api.product.ProductDubboService;
 import com.shop.order.entity.Order;
 import com.shop.order.mapper.OrderMapper;
 import com.shop.order.service.OrderService;
+import com.shop.order.service.dto.CreateOrderCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +44,7 @@ class OrderDubboServiceImplTest {
 
     private Order testOrder;
     private OrderResponse testOrderResponse;
+    private UserOrdersRequest testUserOrdersRequest;
 
     @BeforeEach
     void setUp() {
@@ -61,63 +63,47 @@ class OrderDubboServiceImplTest {
         testOrderResponse.setOrderNo("ORD202405011200000001");
         testOrderResponse.setUserId(1L);
         testOrderResponse.setTotalAmount(new BigDecimal("199.99"));
+
+        testUserOrdersRequest = new UserOrdersRequest();
+        testUserOrdersRequest.setUserId(1L);
+        testUserOrdersRequest.setPage(1);
+        testUserOrdersRequest.setSize(10);
     }
 
     @Test
-    void testCreateOrder() {
-        CreateOrderRequest.OrderItemRequest itemRequest = new CreateOrderRequest.OrderItemRequest();
-        itemRequest.setProductId(1L);
-        itemRequest.setQuantity(2);
-
+    void testCreate() {
         CreateOrderRequest request = new CreateOrderRequest();
-        request.setUserId(1L);
-        request.setAddressId(1L);
-        request.setItems(List.of(itemRequest));
 
-        com.shop.order.service.dto.CreateOrderCommand command =
-                new com.shop.order.service.dto.CreateOrderCommand();
-        command.setUserId(1L);
-        command.setAddressId(1L);
+        CreateOrderCommand command = new CreateOrderCommand();
 
         when(orderMapper.toServiceCreateOrderRequest(request)).thenReturn(command);
         when(orderService.createOrder(command)).thenReturn(testOrder);
         when(orderMapper.toDTO(testOrder)).thenReturn(testOrderResponse);
 
-        OrderResponse result = orderDubboService.createOrder(request);
+        Result<OrderResponse> result = orderDubboService.create(request);
 
         assertNotNull(result);
-        assertEquals("ORD202405011200000001", result.getOrderNo());
+        assertEquals("ORD202405011200000001", result.getData().getOrderNo());
     }
 
     @Test
-    void testGetOrderById() {
+    void testGetById() {
         when(orderService.getOrderById(1L)).thenReturn(testOrder);
         when(orderMapper.toDTO(testOrder)).thenReturn(testOrderResponse);
 
-        OrderResponse result = orderDubboService.getOrderById(1L);
+        Result<OrderResponse> result = orderDubboService.getById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
+        assertEquals(1L, result.getData().getId());
     }
 
     @Test
-    void testGetOrderByOrderNo() {
-        when(orderService.getOrderByOrderNo("ORD202405011200000001")).thenReturn(testOrder);
-        when(orderMapper.toDTO(testOrder)).thenReturn(testOrderResponse);
-
-        OrderResponse result = orderDubboService.getOrderByOrderNo("ORD202405011200000001");
-
-        assertNotNull(result);
-        assertEquals("ORD202405011200000001", result.getOrderNo());
-    }
-
-    @Test
-    void testGetUserOrders() {
+    void testUser() {
         Page<Order> orderPage = new PageImpl<>(List.of(testOrder));
         when(orderService.getUserOrders(1L, null, 1, 10)).thenReturn(orderPage);
         when(orderMapper.toDTO(testOrder)).thenReturn(testOrderResponse);
 
-        PageResult<OrderResponse> result = orderDubboService.getUserOrders(1L, null, 1, 10);
+        PageResult<OrderResponse> result = orderDubboService.user(testUserOrdersRequest);
 
         assertNotNull(result);
         assertEquals(1, result.getTotal());
@@ -131,8 +117,6 @@ class OrderDubboServiceImplTest {
 
         com.shop.order.service.dto.PayOrderCommand command =
                 new com.shop.order.service.dto.PayOrderCommand();
-        command.setPayMethod("wechat");
-        command.setPayNo("PAY123456");
 
         when(orderMapper.toServicePayOrderRequest(request)).thenReturn(command);
         doNothing().when(orderService).payOrder(1L, command);

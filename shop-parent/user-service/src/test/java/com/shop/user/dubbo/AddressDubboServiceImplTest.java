@@ -1,6 +1,7 @@
 package com.shop.user.dubbo;
 
 import com.shop.dubbo.api.address.AddressResponse;
+import com.shop.dubbo.api.user.UserAddressRequest;
 import com.shop.user.entity.Address;
 import com.shop.user.mapper.AddressMapper;
 import com.shop.user.service.AddressService;
@@ -30,6 +31,7 @@ class AddressDubboServiceImplTest {
 
     private Address testAddress;
     private AddressResponse testAddressResponse;
+    private UserAddressRequest testRequest;
 
     @BeforeEach
     void setUp() {
@@ -49,6 +51,9 @@ class AddressDubboServiceImplTest {
         testAddressResponse.setReceiverName("Test User");
         testAddressResponse.setReceiverPhone("13800138000");
         testAddressResponse.setIsDefault(1);
+
+        testRequest = new UserAddressRequest();
+        testRequest.setUserId(1L);
     }
 
     @Test
@@ -56,7 +61,7 @@ class AddressDubboServiceImplTest {
         when(addressService.getAddressesByUserId(1L)).thenReturn(List.of(testAddress));
         when(addressMapper.toDTO(testAddress)).thenReturn(testAddressResponse);
 
-        List<AddressResponse> result = addressDubboService.getAddressesByUserId(1L);
+        List<AddressResponse> result = addressDubboService.getAddresses(testRequest);
 
         assertNotNull(result);
         assertEquals(1, result.size());

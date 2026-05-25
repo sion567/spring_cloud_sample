@@ -74,7 +74,7 @@ class OrderServiceTest {
         command.setAddressId(1L);
         command.setItems(List.of(itemCommand));
 
-        when(productDubboService.getProductById(1L)).thenReturn(testProduct);
+        when(productDubboService.getById(1L).getData()).thenReturn(testProduct);
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order o = invocation.getArgument(0);
             o.setId(1L);
@@ -89,7 +89,7 @@ class OrderServiceTest {
         assertTrue(result.getOrderNo().startsWith("ORD"));
         assertEquals(1L, result.getUserId());
         assertEquals(1L, result.getAddressId());
-        verify(productDubboService).getProductById(1L);
+        verify(productDubboService).getById(1L);
     }
 
     @Test
@@ -109,7 +109,7 @@ class OrderServiceTest {
         command.setAddressId(1L);
         command.setItems(List.of(itemCommand));
 
-        when(productDubboService.getProductById(1L)).thenReturn(lowStockProduct);
+        when(productDubboService.getById(1L).getData()).thenReturn(lowStockProduct);
 
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> orderService.createOrder(command));

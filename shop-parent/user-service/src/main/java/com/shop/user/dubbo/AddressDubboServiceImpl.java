@@ -5,6 +5,7 @@ import com.shop.common.entity.Result;
 import com.shop.dubbo.api.address.AddressResponse;
 import com.shop.dubbo.api.address.AddressDubboService;
 import com.shop.dubbo.api.common.QueryParams;
+import com.shop.dubbo.api.user.UserAddressRequest;
 import com.shop.user.mapper.AddressMapper;
 import com.shop.user.service.AddressService;
 import lombok.RequiredArgsConstructor;
@@ -50,9 +51,9 @@ public class AddressDubboServiceImpl extends CrudDubboServiceImpl implements Add
     }
 
     @Override
-    public List<AddressResponse> getAddressesByUserId(Long userId) {
-        logRequest("getAddressesByUserId", "userId=", userId);
-        return addressService.getAddressesByUserId(userId).stream()
+    public List<AddressResponse> getAddresses(UserAddressRequest request) {
+        logRequest("getAddressesByUserId", "request=", request);
+        return addressService.getAddressesByUserId(request.getUserId()).stream()
                 .map(addressMapper::toDTO).toList();
     }
 

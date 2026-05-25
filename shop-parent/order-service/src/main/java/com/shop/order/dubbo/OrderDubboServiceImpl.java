@@ -5,7 +5,6 @@ import com.shop.common.entity.Result;
 import com.shop.dubbo.api.common.PageResult;
 import com.shop.dubbo.api.common.QueryParams;
 import com.shop.dubbo.api.order.*;
-import com.shop.dubbo.api.product.ProductDubboService;
 import com.shop.order.mapper.OrderMapper;
 import com.shop.order.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -13,22 +12,17 @@ import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.dubbo.config.annotation.Method;
 
-@DubboService(version = "1.0", timeout = 3000,    // 接口级的默认超时时间
+@DubboService(version = "1.0", timeout = 3000,
         methods = {
-                // 👇 针对查询方法：允许重试 2 次（加上首次调用共3次）
                 @Method(name = "getById", retries = 2),
                 @Method(name = "listPost", retries = 2),
-                @Method(name = "getUserOrders", retries = 2),
-                // 👇 针对新增/修改方法：强制禁用重试（retries = 0）
+                @Method(name = "user", retries = 2),
                 @Method(name = "create", retries = 0),
         })
 @RequiredArgsConstructor
 public class OrderDubboServiceImpl extends CrudDubboServiceImpl implements OrderDubboService {
     private final OrderService orderService;
     private final OrderMapper orderMapper;
-
-    @DubboReference
-    private ProductDubboService productDubboService;
 
     @Override
     public Result<OrderResponse> getById(Long id) {
@@ -68,14 +62,14 @@ public class OrderDubboServiceImpl extends CrudDubboServiceImpl implements Order
     }
 
     @Override
-    public PageResult<OrderResponse> getUserOrders(Long userId, Integer status, Integer page, Integer size) {
-        logRequest("getUserOrders", "userId=, status=, page=, size=", userId, status, page, size);
-        var pageResult = orderService.getUserOrders(userId, status, page, size);
+    public PageResult<OrderResponse> user(UserOrdersRequest request) {
+        logRequest("user", "request=", request);
+        var pageResult = orderService.getUserOrders(request.getUserId(), request.getStatus(), request.getPage(), request.getSize());
         return PageResult.of(
                 pageResult.getContent().stream().map(orderMapper::toDTO).toList(),
                 pageResult.getTotalElements(),
-                page,
-                size
+                request.getPage(),
+                request.getSize()
         );
     }
 

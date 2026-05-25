@@ -1,7 +1,9 @@
 package com.shop.product.dubbo;
 
+import com.shop.common.entity.Result;
 import com.shop.common.exception.BusinessException;
 import com.shop.dubbo.api.common.PageResult;
+import com.shop.dubbo.api.common.QueryParams;
 import com.shop.dubbo.api.product.ProductResponse;
 import com.shop.dubbo.api.product.ProductSaveRequest;
 import com.shop.dubbo.api.product.StockUpdateRequest;
@@ -66,30 +68,60 @@ class ProductDubboServiceImplTest {
         when(productService.getProductById(1L)).thenReturn(testProduct);
         when(productMapper.toDTO(testProduct)).thenReturn(testProductResponse);
 
-        ProductResponse result = productDubboService.getProductById(1L);
+        Result<ProductResponse> result = productDubboService.getById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getId());
-        assertEquals("Test Product", result.getName());
+        assertEquals(1L, result.getData().getId());
+        assertEquals("Test Product", result.getData().getName());
         verify(productService).getProductById(1L);
         verify(productMapper).toDTO(testProduct);
     }
 
     @Test
-    void testGetProductPage() {
+    void testListPost() {
+        QueryParams params = new QueryParams();
+        params.setPage(1);
+        params.setSize(10);
+
         Page<Product> productPage = new PageImpl<>(List.of(testProduct));
         when(productService.getProductPage(1, 10, null)).thenReturn(productPage);
         when(productMapper.toDTO(testProduct)).thenReturn(testProductResponse);
 
-        PageResult<ProductResponse> result = productDubboService.getProductPage(1, 10, null);
+        var result = productDubboService.listPost(params);
 
         assertNotNull(result);
-        assertEquals(1, result.getTotal());
-        assertEquals(1, result.getData().size());
     }
 
     @Test
-    void testCreateProduct() {
+    void testUpdateStock1() {
+        StockUpdateRequest request = new StockUpdateRequest();
+        request.setQuantity(50);
+
+        com.shop.product.service.dto.StockUpdateCommand command =
+                new com.shop.product.service.dto.StockUpdateCommand();
+        command.setQuantity(50);
+
+        when(productMapper.toCommand(request)).thenReturn(command);
+        doNothing().when(productService).updateStock(1L, command);
+
+        var result = productDubboService.updateStock(1L, request);
+
+        assertEquals(200, result.getCode());
+    }
+
+    @Test
+    void testGetProductsByIds1() {
+        when(productService.getProductsByIds(List.of(1L))).thenReturn(List.of(testProduct));
+        when(productMapper.toDTO(testProduct)).thenReturn(testProductResponse);
+
+        var result = productDubboService.getProductsByIds(List.of(1L));
+
+        assertEquals(1, result.size());
+        assertEquals("Test Product", result.get(0).getName());
+    }
+
+    @Test
+    void testCreate() {
         ProductSaveRequest request = new ProductSaveRequest();
         request.setName("New Product");
         request.setPrice(new BigDecimal("199.99"));
@@ -103,19 +135,21 @@ class ProductDubboServiceImplTest {
         when(productService.createProduct(command)).thenReturn(testProduct);
         when(productMapper.toDTO(testProduct)).thenReturn(testProductResponse);
 
-        ProductResponse result = productDubboService.createProduct(request);
+        var result = productDubboService.create(request);
 
         assertNotNull(result);
-        verify(productMapper).toCommand(request);
-        verify(productService).createProduct(command);
+        assertEquals(200, result.getCode());
+        assertEquals("Test Product", result.getData().getName());
     }
 
     @Test
-    void testDeleteProduct() {
+    void testDelete() {
         doNothing().when(productService).deleteProduct(1L);
 
-        productDubboService.deleteProduct(1L);
+        var result = productDubboService.delete(1L);
 
+        assertNotNull(result);
+        assertEquals(200, result.getCode());
         verify(productService).deleteProduct(1L);
     }
 

@@ -86,8 +86,8 @@ export const userApi = {
     })
   },
   getUser: (id) => request(`/user/${id}`),
-  getAddresses: (userId) => request(`/user/${userId}/address`),
-  addAddress: (userId, data) => request(`/user/${userId}/address`, { method: 'POST', body: data }),
+  getAddresses: (userId) => request('/user/address/get', { method: 'POST', body: { userId } }),
+  addAddress: (userId, data) => request('/user/address/add', { method: 'POST', body: { userId, ...data } }),
   logout: () => removeToken()
 }
 

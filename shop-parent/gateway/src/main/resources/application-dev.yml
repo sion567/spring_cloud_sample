@@ -12,6 +12,18 @@ spring:
           enabled: false
           lower-case-service-name: true
       routes:
+        - id: user_address_get_route
+          uri: http://localhost:50051
+          predicates:
+            - Path=/api/user/address/get
+          filters:
+            - RewritePath=/api/user/address/get, /com.shop.dubbo.api.address.AddressDubboService/getAddresses
+        - id: user_address_add_route
+          uri: http://localhost:50051
+          predicates:
+            - Path=/api/user/address/add
+          filters:
+            - RewritePath=/api/user/address/add, /com.shop.dubbo.api.address.AddressDubboService/addAddress
         - id: user_service_route
           uri: http://localhost:50051
           predicates:

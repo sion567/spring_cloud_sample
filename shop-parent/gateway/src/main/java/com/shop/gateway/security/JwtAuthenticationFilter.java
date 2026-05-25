@@ -4,6 +4,7 @@ import com.shop.common.jwt.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,12 +37,14 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         String token = extractToken(exchange.getRequest());
         if (token == null) {
-            return chain.filter(exchange);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
 
         try {
             if (!JwtUtils.validateToken(jwtSecret, token)) {
-                return chain.filter(exchange);
+                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                return exchange.getResponse().setComplete();
             }
 
             Claims claims = JwtUtils.parseToken(jwtSecret, token);
@@ -59,9 +62,9 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         } catch (Exception e) {
             log.warn("JWT validation failed: {}", e.getMessage());
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
         }
-
-        return chain.filter(exchange);
     }
 
     private boolean isPublicPath(String path, String method) {
