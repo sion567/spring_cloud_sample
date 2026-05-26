@@ -22,6 +22,9 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-sender-urlconnection'
 
     implementation 'org.mapstruct:mapstruct'
+    implementation 'com.google.protobuf:protobuf-java'
+    implementation 'com.google.protobuf:protobuf-java-util'
+    implementation 'ch.qos.logback:logback-classic'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.mockito:mockito-core'

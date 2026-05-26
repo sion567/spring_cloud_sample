@@ -2,38 +2,77 @@ server:
   port: -1
 
 spring:
-  application:
-    name: user-service
   profiles:
     active: dev
+  application:
+    name: user-service
   cloud:
     nacos:
+      config:
+        server-addr: 192.168.40.198:8848
+        namespace: 9fa6ef4b-0e59-475a-9626-8399ded16a41
+        username: 'nacos'
+        password: 'nacos'
+        file-extension: yaml
       discovery:
         server-addr: 192.168.40.198:8848
-        fail-fast: false
-        timeout: 5000
-        watch-delay: 30000
-        namespace: public
-        management-port: ${server.port}
-        metadata:
-          management.port: ${server.port}
+        namespace: 9fa6ef4b-0e59-475a-9626-8399ded16a41
+        username: 'nacos'
+        password: 'nacos'
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+management:
   zipkin:
-    base-url: http://192.168.40.198:9411
-  sleuth:
-    sampler:
+    tracing:
+      endpoint: http://192.168.40.198:9411/api/v2/spans
+  tracing:
+    enabled: true
+    sampling:
       probability: 1.0
+    propagation:
+      type: b3
+  endpoints:
+    web:
+      exposure:
+        # 只明确暴露需要的端点：健康检查、基础信息、Prometheus指标、以及Dubbo专属指标
+        include: health,info,prometheus,dubbo,dubbo-properties
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
 
 dubbo:
   application:
-    name: ${spring.application.name}
+    name: ${spring.application.name}-rpc
+    logger: slf4j
     qos-enable: false
+    register-mode: instance
   protocol:
-    name: tri
+    name: dubbo
     port: ${DUBBO_PORT:50051}
+    ext-protocol: tri
+    preferred-protocol: tri
   registry:
-    address: nacos://192.168.40.198:8848
+    id: nacos-registry
+    address: nacos://192.168.40.198:8848?username=nacos&password=nacos
     parameters:
-      namespace: public
+      namespace: 9fa6ef4b-0e59-475a-9626-8399ded16a41
+      migration.step: FORCE_APPLICATION
+  config-center:
+    id: nacos-registry
+    address: nacos://192.168.40.198:8848?username=nacos&password=nacos
+    parameters:
+      namespace: 9fa6ef4b-0e59-475a-9626-8399ded16a41
+  metadata-report:
+    id: nacos-registry
+    address: nacos://192.168.40.198:8848?username=nacos&password=nacos
+    parameters:
+      namespace: 9fa6ef4b-0e59-475a-9626-8399ded16a41
+    metadata-type: remote
   metrics:
     protocol: prometheus
     enable-jvm: true
@@ -49,3 +88,5 @@ logging:
   level:
     root: INFO
     com.shop: DEBUG
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
